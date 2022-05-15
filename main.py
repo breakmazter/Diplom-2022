@@ -3,11 +3,14 @@ from pydantic import BaseModel, Field
 
 from filters.ner_filter import NerFilter
 from filters.regex_filter import RegexFilter
+from preprocessing import Preprocessor
 
 app = FastAPI()
 
 regex_filter = RegexFilter()
 ner_filter = NerFilter()
+
+preprocessor = Preprocessor()
 
 
 class Document(BaseModel):
@@ -21,6 +24,8 @@ class Document(BaseModel):
     description='Finds sensitive data in the text.',
 )
 def find_sensitive_data(document: Document = Body(..., description='Find sensitive data.')) -> Document:
+    document.text = preprocessor.preprocess(document.text)
+
     document.text = regex_filter.find_sensitive_data(document.text)
     document.text = ner_filter.find_sensitive_data(document.text)
 
@@ -34,6 +39,8 @@ def find_sensitive_data(document: Document = Body(..., description='Find sensiti
     description='Removes sensitive data from the text.',
 )
 def remove_sensitive_data(document: Document = Body(..., description='Remove sensitive data.')) -> Document:
+    document.text = preprocessor.preprocess(document.text)
+
     document.text = regex_filter.remove_sensitive_data(document.text)
     document.text = ner_filter.remove_sensitive_data(document.text)
 
