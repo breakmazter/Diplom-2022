@@ -28,10 +28,17 @@ class RegexFilter:
 
         return text
 
-    def filter_text(self, text: str) -> str:
+    def find_sensitive_data(self, text: str) -> str:
         text = self.remove_numbers(text)
         text = self.remove_postal_codes(text)
         text = self.remove_email(text)
         text = self.remove_dates(text)
+
+        return text
+
+    def remove_sensitive_data(self, text: str) -> str:
+        text = self.find_sensitive_data(text)
+
+        text = text.replace("<SENSITIVE_DATA>", "")
 
         return text

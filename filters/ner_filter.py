@@ -5,9 +5,8 @@ class NerFilter:
     def __init__(self, model_name: str = "nl_core_news_sm"):
         self.ner_model = spacy.load(model_name)
 
-    @staticmethod
-    def ner_filter(text: str) -> str:
-        text = ner_model(text)
+    def find_sensitive_data(self, text: str) -> str:
+        text = self.ner_model(text)
 
         filtered_string = ""
 
@@ -16,9 +15,16 @@ class NerFilter:
                 new_token = "<SENSITIVE_DATA>"
             elif token.pos_ == "PUNCT":
                 new_token = token.text
-        else:
-            new_token = " {}".format(token.text)
+            else:
+                new_token = " {}".format(token.text)
 
-        filtered_string += new_token
+            filtered_string += new_token
 
         return filtered_string[1:]
+
+    def remove_sensitive_data(self, text: str) -> str:
+        text = self.find_sensitive_data(text)
+
+        text = text.replace("<SENSITIVE_DATA>", "")
+
+        return text
